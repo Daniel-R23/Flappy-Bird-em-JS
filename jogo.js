@@ -85,17 +85,76 @@ const planoDeFundo = {
     }
 }
 
+//Tela Inicial
+const mensagemGetReady = {
+    spriteX:134,
+    spriteY:0,
+    largura:174,
+    altura:152,
+    x:(canvas.width / 2) - 174 / 2,
+    y:50,
+    desenha(){
+        contexto.drawImage(
+            sprites,
+            mensagemGetReady.spriteX,mensagemGetReady.spriteY,
+            mensagemGetReady.largura,mensagemGetReady.altura,
+            mensagemGetReady.x, mensagemGetReady.y,
+            mensagemGetReady.largura,mensagemGetReady.altura
+        )
+    }
+}
 
+
+//
+// [Telas]
+//
+let telaAtiva ={}
+function mudaParaTela(novaTela){
+    telaAtiva = novaTela
+}
+const Telas = {
+    INICIO: {
+        desenha(){
+            planoDeFundo.desenha()
+            flappyBird.desenha()
+            chao.desenha()
+            mensagemGetReady.desenha()
+        },
+        click(){
+            mudaParaTela(Telas.JOGO)
+        },
+        atualiza(){
+
+        }
+    }
+}
+Telas.JOGO = {
+    desenha(){
+        planoDeFundo.desenha()
+        flappyBird.desenha()
+        chao.desenha()
+    },
+    atualiza(){
+        flappyBird.atualiza()
+    }
+}
 
 /* O desenho dos elementos várias vezes por segundo(FPS)
 A função requestAnimationFrame() ajuda a desenhar os quadros na tela da forma mais inteligente possível
 A função loop vai ficar desenhando os elementos na imagem de forma infinita */
 function loop(){
-    planoDeFundo.desenha()
-    flappyBird.atualiza()
-    flappyBird.desenha()
-    chao.desenha()
+
+    telaAtiva.desenha()
+    telaAtiva.atualiza() 
+
     requestAnimationFrame(loop)
 }
 
+window.addEventListener('click', function(){
+    if(telaAtiva.click){
+        telaAtiva.click()
+    }
+})
+
+mudaParaTela(Telas.INICIO)
 loop()
