@@ -1,35 +1,69 @@
 console.log('[Daniel Rodrigues] Flappy Bird')
 
+
+const som_HIT = new Audio()
+som_HIT.src = './efeitos/efeitos_hit.wav'
+
+
 const sprites = new Image()
 sprites.src = 'sprites.png'
 
 const canvas = document.querySelector('canvas')
 const contexto = canvas.getContext('2d')
 
-//Personagem principal
-const flappyBird = { 
-    spriteX:0,
-    spriteY:0,
-    largura:34,
-    altura:24,
-    x:10,
-    y:50,
-    gravidade: 0.25,
-    velocidade:0,
-    desenha(){
-        contexto.drawImage(
-            sprites,
-            flappyBird.spriteX,flappyBird.spriteY,
-            flappyBird.largura,flappyBird.altura,
-            flappyBird.x, flappyBird.y,
-            flappyBird.largura,flappyBird.altura
-        )
-    },
-    atualiza(){
-        flappyBird.velocidade += flappyBird.gravidade
-        flappyBird.y = flappyBird.y+flappyBird.velocidade;
+
+function fazColisao(flappyBird, chao){
+    const flappyBirdY = flappyBird.y + flappyBird.altura
+    const chaoY = chao.y
+    if(flappyBirdY>= chaoY){
+        return true
+    }else{
+        return false
     }
 }
+
+//Personagem principal
+function criaFlappyBird(){
+    const flappyBird = { 
+        spriteX:0,
+        spriteY:0,
+        largura:34,
+        altura:24,
+        x:10,
+        y:50,
+        pulo: 4.6,
+        pula(){
+            flappyBird.velocidade = -flappyBird.pulo
+        },
+        gravidade: 0.25,
+        velocidade:0,
+        desenha(){
+            contexto.drawImage(
+                sprites,
+                flappyBird.spriteX,flappyBird.spriteY,
+                flappyBird.largura,flappyBird.altura,
+                flappyBird.x, flappyBird.y,
+                flappyBird.largura,flappyBird.altura
+            )
+        },
+        atualiza(){
+            if(fazColisao(flappyBird, chao)){
+                som_HIT.play()
+
+                setTimeout(()=>{
+                    mudaParaTela(Telas.INICIO)
+                }, 500)
+                
+                return
+            }
+    
+            flappyBird.velocidade += flappyBird.gravidade
+            flappyBird.y = flappyBird.y+flappyBird.velocidade;
+        }
+    }
+    return flappyBird
+}
+
   
 //Chão
 const chao = {
@@ -108,15 +142,23 @@ const mensagemGetReady = {
 //
 // [Telas]
 //
+const globais = {}
 let telaAtiva ={}
 function mudaParaTela(novaTela){
     telaAtiva = novaTela
+    if(telaAtiva.inicializa){
+        telaAtiva.inicializa()
+    }
 }
+
 const Telas = {
     INICIO: {
+        inicializa(){
+            globais.flappyBird = criaFlappyBird()
+        },
         desenha(){
             planoDeFundo.desenha()
-            flappyBird.desenha()
+            globais.flappyBird.desenha()
             chao.desenha()
             mensagemGetReady.desenha()
         },
@@ -131,11 +173,14 @@ const Telas = {
 Telas.JOGO = {
     desenha(){
         planoDeFundo.desenha()
-        flappyBird.desenha()
+        globais.flappyBird.desenha()
         chao.desenha()
     },
+    click(){
+        globais.flappyBird.pula()
+    },
     atualiza(){
-        flappyBird.atualiza()
+        globais.flappyBird.atualiza()
     }
 }
 
