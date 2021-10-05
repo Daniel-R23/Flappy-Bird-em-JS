@@ -36,7 +36,7 @@ function criaFlappyBird(){
         pula(){
             flappyBird.velocidade = -flappyBird.pulo
         },
-        gravidade: 0.25,
+        gravidade: 0.15,
         velocidade:0,
         frameAtual:0,
         atualizaOFrameAtual(){
